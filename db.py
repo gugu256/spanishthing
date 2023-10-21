@@ -18,6 +18,10 @@ class SimpleDB:
         db[key] = value
         json.dump(db, open(self.filename, "w"))
         del db
+
+    def set(self, key, value):
+        # basically the same as insert, but other name
+        self.insert(key, value)
     
     def get(self):
         # Get the whole DB as a dict

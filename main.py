@@ -23,7 +23,23 @@ def getwords(num):
 
 @app.route('/') # Homepage
 def home():
-    return render_template("index.html")
+    with open("templates/index.html", "r") as f:
+        htmlcode = f.read()
+
+    leaderboard = scores.get()
+    sorted_keys = list(reversed(sorted(leaderboard)))
+    
+    if len(sorted_keys) >= 1:
+        for i in range(0, len(sorted_keys)):
+            key = sorted_keys[i]
+            n = i+1
+            htmlcode += f"""<p>{n} : <u>{key}</u> (score : {leaderboard[key]})"""
+
+    htmlcode += """
+                </body>
+                </html>
+                """
+    return htmlcode
 
 @app.route('/test') # Test form
 def test():
@@ -53,23 +69,22 @@ def test():
 
 @app.route("/resultats", methods=["POST"])
 def results():
-    #name = request.form["fname"]
     score = 0
     pseudo = request.form["pseudo"]
     inwords = request.form
     with open("templates/resultats.html", "r") as f:
         htmlcode = f.read()
     htmlcode += """
-                <p>Note : {SCORE}/5</p>
+                <p>Score : {SCORE}/5</p>
                """
 
     for key in inwords:
-        if key != "pseudo" and inwords[key].lower() in words[key] :
+        if key != "" and key != "pseudo" and inwords[key].lower() in words[key] :
             score += 1
             htmlcode += f"""
                         <p class="rightanswer">{key} : {words[key]}</p>
                         """
-        elif key != "pseudo" and inwords[key].lower() not in words[key]:
+        elif key != "pseudo" and inwords[key].lower() not in words[key] or key != "pseudo" and key == "":
             htmlcode += f"""
                         <p><span class="wronganswer">{key} : {inwords[key]}</span>  <span class="rightanswer">{key} : {words[key]}</span></p>
                         """
@@ -81,6 +96,16 @@ def results():
                 </body>
                 </html>
                 """
+    
+    if pseudo != "" and len(pseudo) > 1:
+        if pseudo not in scores.getkeys():
+            scores.insert(pseudo, score)
+        elif pseudo in scores.getkeys():
+            newscore = scores.get()[pseudo]
+            newscore += score
+            scores.set(pseudo, newscore)
+
+
     return htmlcode
 
 app.run(host='0.0.0.0',port=8080)
