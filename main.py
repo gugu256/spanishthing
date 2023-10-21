@@ -29,51 +29,20 @@ def home():
 def test():
     with open("templates/test.html", "r") as f:
         htmlcode = f.read()
-    testwords = getwords(10)
+    testwords = getwords(5)
 
     for word in testwords:
         htmlcode += f"""
                     <label for="{word}">{word} : </label>
-                    <input type="text" name="{word}"><br>
+                    <input type="text" name="{word}"><br><br>
                     """
         
     htmlcode += """
-                <!-- Commenting leaderboard cause meh
-                <label for="fname">Entre ton nom pour le classement (si tu ne veux pas être dans le classement, choisis 'Anonyme') : 
-                <select name="fname">
-                    <option value="Anonyme">Anonyme</option>
-                    <option value="Jules">Jules</option>
-                    <option value="Syrine">Syrine</option>
-                    <option value="Elijah">Elijah</option>
-                    <option value="Zélie">Zélie</option>
-                    <option value="Lucie">Lucie</option>
-                    <option value="Mouhamed">Mouhamed</option>
-                    <option value="Alix DC">Alix DC</option>
-                    <option value="Elina">Elina</option>
-                    <option value="Luca">Luca</option>
-                    <option value="Inès">Inès</option>
-                    <option value="Gustave">Gustave</option>
-                    <option value="Jasmine">Jasmine</option>
-                    <option value="Dolunay">Dolunay</option>
-                    <option value="Dridi">Dridi</option>
-                    <option value="Etan">Etan</option>
-                    <option value="Emina">Emina</option>
-                    <option value="Ella">Ella</option>
-                    <option value="Nawel">Nawel</option>
-                    <option value="Izumi">Izumi</option>
-                    <option value="Paul">Paul</option>
-                    <option value="Juliette">Juliette</option>
-                    <option value="Fleur">Fleur</option>
-                    <option value="Basile">Basile</option>
-                    <option value="Manon">Manon</option>
-                    <option value="Alix RS">Alix RS</option>
-                    <option value="Louise">Louise</option>
-                    <option value="Raphaël">Raphaël</option>
-                    <option value="Hippolyte Vales">Hippolyte Vales</option>
-                    <option value="Hippolyte Van Tichelen">Hippolyte Van Tichelen</option>
-                    <option value="Syrine">Elena</option>
-                </select>
-                -->
+                <br>
+                <label for="pseudo">Pseudo pour le classement (si tu ne veux pas être dans le classement, ne mets rien) : </label>
+                <input type="text" name="pseudo">
+                <br>
+                <br>
                 <br>
                 <input type="submit" value="Envoyer">
                 </form>
@@ -85,6 +54,28 @@ def test():
 @app.route("/resultats", methods=["POST"])
 def results():
     #name = request.form["fname"]
-    return str(list(request.form.keys()))
+    score = 0
+    pseudo = request.form["pseudo"]
+    inwords = request.form
+    with open("templates/resultats.html", "r") as f:
+        htmlcode = f.read()
+    htmlcode = """
+                <p>Note : {SCORE}/5</p>
+               """
+
+    for key in inwords:
+        if key != "pseudo" and inwords[key].lower() in words[key] :
+            score += 1
+            htmlcode += f"""
+                        <p class="rightanswer">{key} : {words[key]}</p>
+                        """
+
+    htmlcode = htmlcode.replace("{SCORE}", str(score))
+
+    htmlcode += """
+                </body>
+                </html>
+                """
+    return htmlcode
 
 app.run(host='0.0.0.0',port=8080)
