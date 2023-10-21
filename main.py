@@ -9,7 +9,7 @@ app = Flask(__name__)
 scores = SimpleDB("scores")
 wordsdb = SimpleDB("words")
 words = wordsdb.get()
-keys = wordsdb.key()
+keys = wordsdb.getkeys()
 del wordsdb
 
 def getwords(num):
@@ -17,19 +17,28 @@ def getwords(num):
     _keys = keys
     for i in range(0, num):
         n = random.randint(0, len(_keys) - 1)
-        chosenwords.append(words[n])
+        chosenwords.append(_keys[n])
         _keys.pop(n)
     return chosenwords
 
-@app.route('/')
+@app.route('/') # Homepage
 def home():
     return render_template("index.html")
 
-@app.route('/test')
+@app.route('/test') # Test form
 def test():
     with open("templates/test.html", "r") as f:
         htmlcode = f.read()
+    testwords = getwords(10)
+
+    for word in testwords:
+        htmlcode += f"""
+                    <label for="{word}">{word} : </label>
+                    <input type="text" name="{word}"><br>
+                    """
+        
     htmlcode += """
+                <!-- Commenting leaderboard cause meh
                 <label for="fname">Entre ton nom pour le classement (si tu ne veux pas être dans le classement, choisis 'Anonyme') : 
                 <select name="fname">
                     <option value="Anonyme">Anonyme</option>
@@ -64,9 +73,18 @@ def test():
                     <option value="Hippolyte Van Tichelen">Hippolyte Van Tichelen</option>
                     <option value="Syrine">Elena</option>
                 </select>
+                -->
+                <br>
+                <input type="submit" value="Envoyer">
+                </form>
                 </body>
                 </html>
                 """
     return htmlcode
+
+@app.route("/resultats", methods=["POST"])
+def results():
+    #name = request.form["fname"]
+    return str(list(request.form.keys()))
 
 app.run(host='0.0.0.0',port=8080)
