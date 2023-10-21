@@ -59,7 +59,7 @@ def results():
     inwords = request.form
     with open("templates/resultats.html", "r") as f:
         htmlcode = f.read()
-    htmlcode = """
+    htmlcode += """
                 <p>Note : {SCORE}/5</p>
                """
 
@@ -69,10 +69,15 @@ def results():
             htmlcode += f"""
                         <p class="rightanswer">{key} : {words[key]}</p>
                         """
+        elif key != "pseudo" and inwords[key].lower() not in words[key]:
+            htmlcode += f"""
+                        <p><span class="wronganswer">{key} : {inwords[key]}</span>  <span class="rightanswer">{key} : {words[key]}</span></p>
+                        """
 
     htmlcode = htmlcode.replace("{SCORE}", str(score))
 
     htmlcode += """
+                <button><a href="/test">⬅ Refaire un test</a></button>
                 </body>
                 </html>
                 """

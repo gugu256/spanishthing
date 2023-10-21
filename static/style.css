@@ -1,0 +1,14 @@
+.rightanswer {
+    color: green;
+    text-decoration: none;
+}
+
+.wronganswer {
+    color: red;
+    text-decoration: line-through;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
