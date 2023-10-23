@@ -29,8 +29,9 @@ def home():
         htmlcode = f.read()
 
     leaderboard = scores.get()
-    sorted_keys = sorted(leaderboard)
-    
+    sorted_keys = sorted(leaderboard, key=leaderboard.get, reverse=True)
+
+    print(sorted_keys)
     n = 0
     
     for key in sorted_keys:
