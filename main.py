@@ -85,20 +85,25 @@ def test():
 def results():
     score = 0
     pseudo = request.form["pseudo"]
-    inwords = request.form
+    inwords = {}
+
+    for key in request.form:
+        inwords[key] = request.form[key].lower()
+    
     with open("templates/resultats.html", "r") as f:
         htmlcode = f.read()
+
     htmlcode += """
                 <p>Score : {SCORE}/5</p>
                """
 
     for key in inwords:
-        if key != "" and key != "pseudo" and inwords[key].lower() in words[key] :
+        if len(inwords[key]) >= 2 and key != "pseudo" and inwords[key] in words[key] :
             score += 1
             htmlcode += f"""
                         <p class="rightanswer">{key} : {words[key]}</p>
                         """
-        elif key != "pseudo" and inwords[key].lower() not in words[key] or key != "pseudo" and key == "":
+        elif key != "pseudo" and inwords[key] not in words[key] or key != "pseudo" and len(inwords[key]) < 2:
             htmlcode += f"""
                         <p><span class="wronganswer">{key} : {inwords[key]}</span>  <span class="rightanswer">{key} : {words[key]}</span></p>
                         """
@@ -107,6 +112,9 @@ def results():
 
     htmlcode += """
                 <button><a href="/test">⬅ Refaire un test</a></button>
+                <br>
+                <br>
+                <a href="/"><u>Accueil</u></a>
                 </body>
                 </html>
                 """
@@ -120,7 +128,8 @@ def results():
             scores.set(pseudo, newscore)
 
     resp = make_response(htmlcode)
-    resp.set_cookie("pseudo", pseudo)
+    if pseudo != "":
+        resp.set_cookie("pseudo", pseudo)
     return resp
 
 app.run(host='0.0.0.0')
